@@ -21,10 +21,7 @@ void EventLoop::run()
     }
 }
 
-Epoll *EventLoop::ep()    //返回ep_
-{
-    return ep_;
-}
+
 
 void EventLoop::updatechannel(Channel *ch)        //把channel 添加/更新 到红黑树上
 {

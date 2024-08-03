@@ -1,6 +1,12 @@
 #pragma once
 #include "Epoll.h"
 
+
+class Channel;
+class Epoll;
+
+
+
 //事件循环类
 class EventLoop
 {
