@@ -1,0 +1,42 @@
+#include "Acceptor.h"
+
+Acceptor::Acceptor(EventLoop *loop, const std::string &ip, const uint16_t port)
+        :loop_(loop)
+{
+    servsock_ = new Socket(createnonblocking()); 
+    InetAddress servaddr(ip,port);
+    servsock_->setkeepalive(true);
+    servsock_->setreuseaddr(true);
+    servsock_->setreuseport(true);
+    servsock_->settcpnodelay(true);
+    servsock_->bind(servaddr);
+    servsock_->listen();
+
+    acceptchannel_ = new Channel(loop_,servsock_->fd());
+    //使用回调函数，绑定一个函数给channel
+    // acceptchannel_->setreadcallback(std::bind(&Channel::newconnection,acceptchannel_,servsock_));
+    acceptchannel_->setreadcallback(std::bind(&Acceptor::newconnection,this));   
+    acceptchannel_->enablereading();
+}
+
+Acceptor::~Acceptor()
+{
+    delete servsock_;
+    delete acceptchannel_;
+}
+#include "Connection.h"
+void Acceptor::newconnection()//处理新客户端连接请求
+{
+    InetAddress clientaddr;
+
+    Socket *clientsock = new Socket(servsock_->accept(clientaddr));
+
+    printf ("accept client(fd=%d,ip=%s,port=%d) ok.\n",clientsock->fd(),clientaddr.ip(),clientaddr.port());
+    /*
+    Channel *clientchannel = new Channel(loop_,clientsock->fd());
+    clientchannel->setreadcallback(std::bind(&Channel::onmessage,clientchannel));
+    clientchannel->useet();
+    clientchannel->enablereading();
+    */
+    Connection *conn = new Connection(loop_,clientsock); //这里new出来的没有释放，以后再解决
+}
