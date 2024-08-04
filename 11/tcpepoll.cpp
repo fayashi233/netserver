@@ -1,6 +1,7 @@
 /*
  * 程序名：tcpepoll.cpp，此程序用于演示采用epoll模型实现网络通讯的服务端。
 */
+/*
 #include <stdio.h>
 #include <memory>
 #include <unistd.h>
@@ -17,8 +18,8 @@
 #include "Socket.h"
 #include "Epoll.h"
 #include "Channel.h"
-#include "EventLoop.h"
-
+#include "EventLoop.h"*/
+#include "TcpServer.h"
 int main(int argc,char *argv[])
 {
     if (argc != 3) 
@@ -28,21 +29,24 @@ int main(int argc,char *argv[])
         return -1; 
     }
 
-    Socket servsock;
-    InetAddress servaddr(argv[1],atoi(argv[2]));
-    servsock.setkeepalive(true);
-    servsock.setreuseaddr(true);
-    servsock.setreuseport(true);
-    servsock.settcpnodelay(true);
-    servsock.bind(servaddr);
-    servsock.listen();
+    // Socket servsock;
+    // InetAddress servaddr(argv[1],atoi(argv[2]));
+    // servsock.setkeepalive(true);
+    // servsock.setreuseaddr(true);
+    // servsock.setreuseport(true);
+    // servsock.settcpnodelay(true);
+    // servsock.bind(servaddr);
+    // servsock.listen();
 
-    EventLoop loop;
-    Channel *servchannel = new Channel(&loop,servsock.fd());
-    //使用回调函数，绑定一个函数给channel
-    servchannel->setreadcallback(std::bind(&Channel::newconnection,servchannel,&servsock));
+    // EventLoop loop;
+    // Channel *servchannel = new Channel(&loop,servsock.fd());
+    // //使用回调函数，绑定一个函数给channel
+    // servchannel->setreadcallback(std::bind(&Channel::newconnection,servchannel,&servsock));
+    // servchannel->enablereading();
+    TcpServer tcpserver(argv[1],atoi(argv[2]));
 
-    servchannel->enablereading();
-    loop.run();     //运行事件循环 
+    tcpserver.start();
+
+    //loop.run();     //运行事件循环 
     return 0;
 }

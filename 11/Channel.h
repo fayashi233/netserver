@@ -6,7 +6,7 @@
 #include <functional>
 #include "EventLoop.h"
 class Epoll;
-
+class EventLoop;
 
 class Channel
 {
