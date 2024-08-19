@@ -94,18 +94,20 @@ void Connection::send(const char *data,size_t size)        //发送数据
 
     if(disconnect_==true) {printf("客户端断开，不发送数据\n");return;}
 
+    //这里要使用智能指针，防止message栈对象在队列任务执行前被释放
+    std::shared_ptr<std::string> message(new std::string(data));
 //    printf("Connection::send() thread is %d.\n",syscall(SYS_gettid));
     if(loop_->isinloopthread()) //判断当前线程是否为事件循环线程（IO线程）
     {
         //如果当前线程是IO线程，直接调用sendinloop()
         printf("send()在事件循环的线程中\n");
-        sendinloop(data,size);
+        sendinloop(message);
     }
     else
     {
         //如果不是IO线程，把发送数据的操作交给IO线程去执行
         printf("send()不在事件循环的线程中\n");
-        loop_->queueinloop(std::bind(&Connection::sendinloop,this,data,size));
+        loop_->queueinloop(std::bind(&Connection::sendinloop,this,message));
     }
 
 }
@@ -162,9 +164,9 @@ void Connection::onmessage()                   //处理对端发过来的报文
 
 
 //发送数据，如果当前线程是IO线程，直接调用此函数，如果是工作线程，将此函数传给IO线程
-void Connection::sendinloop(const char *data,size_t size)
+void Connection::sendinloop(std::shared_ptr<std::string> data)
 {
-    outputbuffer_.appendwithhead(data,size);
+    outputbuffer_.appendwithhead(data->data(),data->size());
     //注册写事件
     clientchannel_->enablewriting();
 }

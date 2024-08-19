@@ -51,8 +51,8 @@ public:
     void send(const char *data,size_t size);    
 
     //发送数据，如果当前线程是IO线程，直接调用此函数，如果是工作线程，将此函数传给IO线程
-    void sendinloop(const char *data,size_t size);
-
+    //void sendinloop(const char *data,size_t size);
+    void sendinloop(std::shared_ptr<std::string> data);
 
     
 };

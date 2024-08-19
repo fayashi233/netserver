@@ -16,7 +16,7 @@ int main(int argc,char *argv[])
     // TcpServer tcpserver(argv[1],atoi(argv[2]));
     // tcpserver.start();
 
-    EchoServer echoserver(argv[1],atoi(argv[2]),3,0);
+    EchoServer echoserver(argv[1],atoi(argv[2]),3,2);
     echoserver.Start();
 
 
